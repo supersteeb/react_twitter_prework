@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import Tweetbox from './Tweetbox';
+import Tweet from './Tweet';
 import './App.css';
-import { Icon, Button } from 'reactbulma'
+import { Icon, Button } from 'reactbulma';
 
 class App extends Component {
 
@@ -10,53 +11,86 @@ class App extends Component {
     super(props);
 
     this.state= {
-      tweets: ['Hello World!', 'Coderschool is the best!']
+      tweets: [
+      {
+      text: 'Hello World!',
+      liked: true
+      },
+      { text: 'Coderschool is the best!',
+        liked: false
+      }
+      ]
     }
   }
 
   handleTweet(tweet) {
+    let tweetObj = {
+      text: tweet,
+      liked: false
+    }
+
     this.setState({
-      tweets: this.state.tweets.concat(tweet)
+      tweets: this.state.tweets.concat(tweetObj)
     });
-    this.deleteRecipe = this.deleteRecipe.bind(this);
   }
 
-      likeTweet(e) {
-        if(e.innerHTML== "like")
-          e.innerHTML="unlike";
-        else
-          e.innerHTML="like";
+  handleLike(tweet) {
+    let tweets = this.state.tweets.map( (t) => {
+      if (t.text == tweet.text) {
+        return {
+          text: t.text,
+          liked: !t.liked
+        } 
       }
+      return t;
+    });
 
-      deleteTweet(e) {
-        const tweets = Object.assign({}, this.state.tweets);
-    const id = e.currentTarget.dataset.id;
-    delete tweets[id];
-    this.setState({ tweets });
-      }
+    this.setState({
+      tweets
+    })
+    
+  }
+
 
   // deleteTweet(tweet) {
        // do something this will probably be rendered
   //}
 
+    deleteTweet(tweet) {
+      let tweets = this.state.tweets;
+      let index = tweets.indexOf(tweet);
+            if (index > -1) {
+          tweets.splice(index, 1);
+      }
+
+      this.setState([
+          tweets
+        ])
+    }
+
   render() {
     return (
+      <div class="container">
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">CoderSchool React Prework</h1>
-        
 
-        </header>
-        <div>
-          <Tweetbox prompt="What's your status?" onTweet={this.handleTweet.bind(this)}/>
+            <header className="App-header">
+              <img src={logo} className="App-logo" alt="logo" />
+              <h1 className="App-title">CoderSchool React Prework</h1>
+            </header>
+            <div>
+              <Tweetbox prompt="What's your status?" onTweet={this.handleTweet.bind(this)}/>
+            </div>
+
+          <div class="box">
+            <div class="box is-centered">
+              { this.state.tweets.map( (tweet) =>
+                  (<Tweet tweet={tweet} 
+                    handleLike={this.handleLike.bind(this)} 
+                    onDelete={this.deleteTweet.bind(this)} />)
+                )}
+            </div>
         </div>
-        <div>
-          { this.state.tweets.map( tweet =>
-              (<p> {tweet} <a onClick={this.deleteTweet}>Like</a> | <a onClick={this.deleteTweet}>Delete</a></p> )
-               //put delete button here?
-            )}
-        </div>
+      </div>
       </div>
     );
   }
